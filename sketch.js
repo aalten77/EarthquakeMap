@@ -3,7 +3,6 @@
  * coding challenge #57 - Mapping Earthquake Data.
  *
  */
-
 var mapimg;
 
 //center of image coordinates
@@ -15,6 +14,9 @@ var zoom = 1;
 
 //holder for loaded CSV file
 var earthquakes;
+
+//constants for color gradient
+let c1, c2, c1_solid, c2_solid;
 
 /**
  *  Preload Google Map Static API and earthquake data.
@@ -65,6 +67,12 @@ function webMercatorY(lat){
  *  @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
  */
 function setup(){
+    //Define colors
+    c1 = color('#89fffdbf'); //light blue w/ 75% transparency - ref: https://css-tricks.com/8-digit-hex-codes/
+    c2 = color('#ef32d9bf'); //magenta w/ 75% transparency - ref: https://css-tricks.com/8-digit-hex-codes/
+    c1_solid = color('#89fffd'); //light blue
+    c2_solid = color('#ef32d9'); //magenta
+
     //canvas with image centerpoint as (0,0). Image is then translated to middle of canvas.
     createCanvas(windowWidth, windowHeight);
     translate(width/2, height/2);
@@ -83,6 +91,11 @@ function setup(){
         var lng = data[2];
         var mag = data[4];
 
+        //color gradient mapping based on magnitude
+        let inter = map(mag, 0, 10, 0, 1);
+        let c = lerpColor(c1, c2, inter);
+        let c_solid = lerpColor(c1_solid, c2_solid, inter);
+
         // convert magnitude to get diameter of circle
         mag = Math.pow(10, mag);
         mag = Math.sqrt(mag);
@@ -94,8 +107,10 @@ function setup(){
         var y = webMercatorY(lat) - centerY;
 
         var diameter = map(mag, 0, magMax, 0, 180);
-        stroke(255, 0, 255);
-        fill(255, 0, 255, 200);
+        stroke(c_solid);
+        fill(c);
+        // stroke(255, 0, 255);
+        // fill(255, 0, 255, 200);
         ellipse(x, y, diameter, diameter);
     }
 
