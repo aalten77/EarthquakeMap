@@ -1,0 +1,3 @@
+# EarthquakeViz
+
+Project for UID.
