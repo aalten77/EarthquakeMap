@@ -1,15 +1,25 @@
+/**
+ * This is a data visualization of Earthquake data from 1 month. This project is based off of Daniel Shiffman's
+ * coding challenge #57 - Mapping Earthquake Data.
+ *
+ */
+
 var mapimg;
 
+//center of image coordinates
 var center_lat = 0;
 var center_lng = 0;
 
-var lat = 31.2304;
-var lng = 121.4737;
-
+//zoom level of static map tile
 var zoom = 1;
 
+//holder for loaded CSV file
 var earthquakes;
 
+/**
+ *  Preload Google Map Static API and earthquake data.
+ *  @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
+ */
 function preload(){
     var mapWidth = 640;//windowWidth.toString();
     var mapHeight = 640;//windowHeight.toString();
@@ -20,6 +30,12 @@ function preload(){
     earthquakes = loadStrings('all_month.csv');
 }
 
+/**
+ * Converts longitude into Web Mercator X coordinate.
+ * @author Daniel Shiffman <https://thecodingtrain.com>
+ * @param {float} lng - Longitude in decimal degrees WGS84.
+ * @returns {number}
+ */
 function webMercatorX(lng){
     lng = radians(lng);
     var a = (128 / Math.PI) * pow(2, zoom); //use 128 since googleMaps uses 128x128 tiles
@@ -27,6 +43,12 @@ function webMercatorX(lng){
     return a * b;
 }
 
+/**
+ * Converts latitude into Web Mercator Y coordinate.
+ * @author Daniel Shiffman <https://thecodingtrain.com>
+ * @param {float} lat - Latitude in decimal degrees WGS84.
+ * @returns {number}
+ */
 function webMercatorY(lat){
     lat = radians(lat);
     var a = (128 / Math.PI) * pow(2, zoom);
@@ -35,15 +57,25 @@ function webMercatorY(lat){
     return a * c;
 }
 
+/**
+ *  Create P5 canvas and load 1 month earthquake data. Project data into Web Mercator coordinates.
+ *  Data points based on magnitude of the earthquake.
+ *  Google Map tile placed in middle of canvas. Map tile will always be 640x640.
+ *
+ *  @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
+ */
 function setup(){
-    createCanvas(640, 640);
+    //canvas with image centerpoint as (0,0). Image is then translated to middle of canvas.
+    createCanvas(windowWidth, windowHeight);
     translate(width/2, height/2);
     imageMode(CENTER);
     image(mapimg, 0,0);
 
+    //center coordinates of image converted to Web Mercator coordinates
     var centerX = webMercatorX(center_lng);
     var centerY = webMercatorY(center_lat);
 
+    //iterate line by line through CSV to get data
     for (var i = 0; i < earthquakes.length; i++){
         var data = earthquakes[i].split(/,/); //regular expression for a single comma
         //console.log(data);
@@ -51,11 +83,13 @@ function setup(){
         var lng = data[2];
         var mag = data[4];
 
+        // convert magnitude to get diameter of circle
         mag = Math.pow(10, mag);
         mag = Math.sqrt(mag);
 
         var magMax = Math.sqrt(Math.pow(10,10));
 
+        // new coordinate offset from center of image
         var x = webMercatorX(lng) - centerX;
         var y = webMercatorY(lat) - centerY;
 
