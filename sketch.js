@@ -69,7 +69,7 @@ function webMercatorY(lat){
  *  @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
  */
 function setup(){
-    //Define colors
+    //Define colors - https://uigradients.com/#AzurePop
     c1 = color('#89fffdbf'); //light blue w/ 75% transparency - ref: https://css-tricks.com/8-digit-hex-codes/
     c2 = color('#ef32d9bf'); //magenta w/ 75% transparency - ref: https://css-tricks.com/8-digit-hex-codes/
     c1_solid = color('#89fffd'); //light blue
