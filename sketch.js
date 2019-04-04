@@ -2,6 +2,8 @@
  * This is a data visualization of Earthquake data from 1 month. This project is based off of Daniel Shiffman's
  * coding challenge #57 - Mapping Earthquake Data.
  *
+ * Data collected from USGS Earthquake Hazards Program: https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php
+ *
  */
 var mapimg;
 
@@ -29,7 +31,7 @@ function preload(){
     print(windowWidth);
     print(windowHeight);
 
-    earthquakes = loadStrings('all_month.csv');
+    earthquakes = loadStrings('all_month_current.csv');
 }
 
 /**
@@ -96,21 +98,21 @@ function setup(){
         let c = lerpColor(c1, c2, inter);
         let c_solid = lerpColor(c1_solid, c2_solid, inter);
 
-        // convert magnitude to get diameter of circle
+        // convert magnitude to logarithmic scale to get diameter of circle
         mag = Math.pow(10, mag);
         mag = Math.sqrt(mag);
 
+        //largest magnitude in logarithmic scale
         var magMax = Math.sqrt(Math.pow(10,10));
 
         // new coordinate offset from center of image
         var x = webMercatorX(lng) - centerX;
         var y = webMercatorY(lat) - centerY;
 
+        //draw circle
         var diameter = map(mag, 0, magMax, 0, 180);
         stroke(c_solid);
         fill(c);
-        // stroke(255, 0, 255);
-        // fill(255, 0, 255, 200);
         ellipse(x, y, diameter, diameter);
     }
 
