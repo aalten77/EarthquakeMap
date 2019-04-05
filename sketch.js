@@ -6,6 +6,7 @@
  *
  */
 var mapimg;
+var myCanvas;
 
 //center of image coordinates
 var center_lat = 0;
@@ -62,6 +63,17 @@ function webMercatorY(lat){
 }
 
 /**
+ * Make canvas center of screen.
+ *
+ * @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
+ */
+function centerCanvas() {
+    var x = (windowWidth - width)/2;
+    var y = (windowHeight - height)/2;
+    myCanvas.position(x, y);
+}
+
+/**
  *  Create P5 canvas and load 1 month earthquake data. Project data into Web Mercator coordinates.
  *  Data points based on magnitude of the earthquake.
  *  Google Map tile placed in middle of canvas. Map tile will always be 640x640.
@@ -76,7 +88,11 @@ function setup(){
     c2_solid = color('#ef32d9'); //magenta
 
     //canvas with image centerpoint as (0,0). Image is then translated to middle of canvas.
-    createCanvas(windowWidth, windowHeight);
+    myCanvas = createCanvas(windowWidth, windowHeight);
+    centerCanvas();
+    myCanvas.parent('myCanvas');
+
+    //TODO: not sure if this translate is necessary - Ai-Linh
     translate(width/2, height/2);
     imageMode(CENTER);
     image(mapimg, 0,0);
@@ -115,7 +131,15 @@ function setup(){
         fill(c);
         ellipse(x, y, diameter, diameter);
     }
+}
 
-
+/**
+ * Execute functions when window is resized.
+ * @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
+ */
+function windowResized() {
+    centerCanvas();
+    //resizeCanvas(windowWidth, windowHeight);
+    setup();
 }
 
