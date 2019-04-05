@@ -5,6 +5,8 @@
  * Data collected from USGS Earthquake Hazards Program: https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php
  *
  */
+
+//holders for image and canvas
 var mapimg;
 var myCanvas;
 
@@ -25,10 +27,11 @@ let c1, c2, c1_solid, c2_solid;
 //TODO: change query dynamically using time slider
 var link = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2019-03-01&endtime=2019-03-31&minlatitude=-90&minlongitude=-180&maxlatitude=90&maxlongitude=180";
 
+//holder to make HTTP requests
 var xhr = new XMLHttpRequest();
 
 /**
- * Make HTTP Request to link for geojson of earthquakes.
+ * Make HTTP Request to link for geojson of earthquakes. Store the features as a featureObj in earthquakes array.
  *
  * @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
  */
@@ -37,11 +40,14 @@ function createFeatures(obj){
     console.log(bbox);
     var myArr = obj['features'];
     for(var i = 0; i < myArr.length; i++){
+
+        //store lat, lng, mag, and time
+        //ref on geojson obj - https://earthquake.usgs.gov/data/comcat/data-eventterms.php#time
         let featureObj = {
             lat: myArr[i]['geometry']['coordinates'][1],
             lng: myArr[i]['geometry']['coordinates'][0],
             mag: myArr[i]['properties']['mag'],
-            time: myArr[i]['properties']['time']
+            time: myArr[i]['properties']['time'] //time is in milliseconds from 1970-01-01T00:00:00.000Z
         };
         earthquakes.push(featureObj);
     }
