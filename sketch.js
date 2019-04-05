@@ -15,11 +15,39 @@ var center_lng = 0;
 //zoom level of static map tile
 var zoom = 1;
 
-//holder for loaded CSV file
-var earthquakes;
+//holder for loaded geojson file
+var earthquakes = new Array();
 
 //constants for color gradient
 let c1, c2, c1_solid, c2_solid;
+
+//link to query geojson data - ref: https://earthquake.usgs.gov/fdsnws/event/1/
+//TODO: change query dynamically using time slider
+var link = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2019-03-01&endtime=2019-03-31&minlatitude=-90&minlongitude=-180&maxlatitude=90&maxlongitude=180";
+
+var xhr = new XMLHttpRequest();
+
+/**
+ * Make HTTP Request to link for geojson of earthquakes.
+ *
+ * @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
+ */
+function createFeatures(obj){
+    let bbox = obj['bbox'];
+    console.log(bbox);
+    var myArr = obj['features'];
+    for(var i = 0; i < myArr.length; i++){
+        let featureObj = {
+            lat: myArr[i]['geometry']['coordinates'][1],
+            lng: myArr[i]['geometry']['coordinates'][0],
+            mag: myArr[i]['properties']['mag'],
+            time: myArr[i]['properties']['time']
+        };
+        earthquakes.push(featureObj);
+    }
+
+    console.log(earthquakes);
+}
 
 /**
  *  Preload Google Map Static API and earthquake data.
@@ -32,7 +60,17 @@ function preload(){
     print(windowWidth);
     print(windowHeight);
 
-    earthquakes = loadStrings('all_month_current.csv');
+    //TODO: figure out why this doesn't load the earthquakes array on page load...
+    xhr.onreadystatechange = function() {
+        if(this.readyState == 4 && this.status == 200){
+            var geojsonObject = JSON.parse(this.responseText);
+            createFeatures(geojsonObject);
+        }
+    };
+
+    xhr.open("GET", link, true);
+    xhr.send();
+    //earthquakes = loadStrings('all_month_current.csv');
 }
 
 /**
@@ -64,6 +102,7 @@ function webMercatorY(lat){
 
 /**
  * Make canvas center of screen.
+ * https://github.com/processing/p5.js/wiki/Positioning-your-canvas
  *
  * @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
  */
@@ -101,13 +140,15 @@ function setup(){
     var centerX = webMercatorX(center_lng);
     var centerY = webMercatorY(center_lat);
 
+
+    console.log(earthquakes);
     //iterate line by line through CSV to get data
     for (var i = 0; i < earthquakes.length; i++){
-        var data = earthquakes[i].split(/,/); //regular expression for a single comma
+        //var data = earthquakes[i].split(/,/); //regular expression for a single comma
         //console.log(data);
-        var lat = data[1];
-        var lng = data[2];
-        var mag = data[4];
+        var lat = earthquakes[i]['lat'];
+        var lng = earthquakes[i]['lng'];
+        var mag = earthquakes[i]['mag'];
 
         //color gradient mapping based on magnitude
         let inter = map(mag, 0, 10, 0, 1);
