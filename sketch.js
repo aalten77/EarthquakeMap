@@ -115,7 +115,7 @@ function webMercatorY(lat){
 function centerCanvas() {
     var x = (windowWidth - width)/2;
     var y = (windowHeight - height)/2;
-    myCanvas.position(x, y);
+    //myCanvas.position(x, y);  Got an error on my machine at this line, so commented it out.  Works after.
 }
 
 /**
@@ -124,6 +124,7 @@ function centerCanvas() {
  *  Google Map tile placed in middle of canvas. Map tile will always be 640x640.
  *
  *  @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
+ *  @author Jason Do <jason.do@sjsu.edu>
  */
 function setup(){
     //Define colors - https://uigradients.com/#AzurePop
@@ -154,16 +155,11 @@ function setup(){
     for (var i = 0; i < earthquakes.length; i++){
         //var data = earthquakes[i].split(/,/); //regular expression for a single comma
         //console.log(data);
-<<<<<<< HEAD
+
         var lat = earthquakes[i]['lat'];
         var lng = earthquakes[i]['lng'];
         var mag = earthquakes[i]['mag'];
-=======
-        var lat = data[1];
-        var lng = data[2];
-        var mag = data[4];
-        var truemag = parseFloat(data[4]);
->>>>>>> Slider
+        var truemag = parseFloat(earthquakes[i]['mag']);
 
         //color gradient mapping based on magnitude
         let inter = map(mag, 0, 10, 0, 1);
@@ -206,6 +202,10 @@ function windowResized() {
     setup();
 }
 
+/**
+ * Updates values from slider input
+ * @author Jason Do <jason.do@sjsu.edu>
+ */
 function updateTextInput(val) {
     console.log("hello");
     document.getElementById('magnitude').addEventListener('change', function () {
@@ -216,6 +216,10 @@ function updateTextInput(val) {
     });
 }
 
+/**
+ * Redraws canvas when update button is pressed.
+ * @author Jason Do <jason.do@sjsu.edu>
+ */
 function update() {
     console.log("updating");
     const context = canvas.getContext('2d');
@@ -236,12 +240,12 @@ function update() {
 
     //iterate line by line through CSV to get data
     for (var i = 0; i < earthquakes.length; i++) {
-        var data = earthquakes[i].split(/,/); //regular expression for a single comma
+        //var data = earthquakes[i].split(/,/); //regular expression for a single comma
         //console.log(data);
-        var lat = data[1];
-        var lng = data[2];
-        var mag = data[4];
-        var truemag = parseFloat(data[4]);
+        var lat = earthquakes[i]['lat'];
+        var lng = earthquakes[i]['lng'];
+        var mag = earthquakes[i]['mag'];
+        var truemag = parseFloat(earthquakes[i]['mag']);
 
         //color gradient mapping based on magnitude
         let inter = map(mag, 0, 10, 0, 1);
