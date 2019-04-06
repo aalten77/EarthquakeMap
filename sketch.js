@@ -79,11 +79,13 @@ function setup(){
     createCanvas(windowWidth, windowHeight);
     translate(width/2, height/2);
     imageMode(CENTER);
-    image(mapimg, 0,0);
+    image(mapimg, 0, 0);
 
     //center coordinates of image converted to Web Mercator coordinates
     var centerX = webMercatorX(center_lng);
     var centerY = webMercatorY(center_lat);
+    var magcap = parseFloat(document.getElementById("magnitude").getAttribute("value"));
+    var scale = parseInt(document.getElementById("scale").getAttribute("value"));
 
     //iterate line by line through CSV to get data
     for (var i = 0; i < earthquakes.length; i++){
@@ -92,6 +94,7 @@ function setup(){
         var lat = data[1];
         var lng = data[2];
         var mag = data[4];
+        var truemag = parseFloat(data[4]);
 
         //color gradient mapping based on magnitude
         let inter = map(mag, 0, 10, 0, 1);
@@ -111,11 +114,86 @@ function setup(){
 
         //draw circle
         var diameter = map(mag, 0, magMax, 0, 180);
-        stroke(c_solid);
-        fill(c);
-        ellipse(x, y, diameter, diameter);
+        console.log(magcap);
+        console.log(truemag);
+        if (truemag < magcap) {
+            stroke(c_solid);
+            fill(c);
+            ellipse(x, y, diameter * scale, diameter * scale);
+        }
+        else {
+            console.log(truemag);
+        }
     }
 
 
 }
 
+function updateTextInput(val) {
+    console.log("hello");
+    document.getElementById('magnitude').addEventListener('change', function () {
+        this.setAttribute('value', this.value);
+    });
+    document.getElementById('scale').addEventListener('change', function () {
+        this.setAttribute('value', this.value);
+    });
+}
+
+function update() {
+    console.log("updating");
+    const context = canvas.getContext('2d');
+    context.clearRect(-width/2, -height/2, canvas.width, canvas.height);
+
+    image(mapimg, 0, 0);
+    //earthquakes = loadStrings('all_month_current.csv');
+    console.log("updating");
+
+    var centerX = webMercatorX(center_lng);
+    var centerY = webMercatorY(center_lat);
+    var magcap = parseFloat(document.getElementById("magnitude").getAttribute("value"));
+    var scale = parseInt(document.getElementById("scale").getAttribute("value"));
+    console.log(magcap);
+    console.log(scale);
+
+    console.log(earthquakes.length);
+
+    //iterate line by line through CSV to get data
+    for (var i = 0; i < earthquakes.length; i++) {
+        var data = earthquakes[i].split(/,/); //regular expression for a single comma
+        //console.log(data);
+        var lat = data[1];
+        var lng = data[2];
+        var mag = data[4];
+        var truemag = parseFloat(data[4]);
+
+        //color gradient mapping based on magnitude
+        let inter = map(mag, 0, 10, 0, 1);
+        let c = lerpColor(c1, c2, inter);
+        let c_solid = lerpColor(c1_solid, c2_solid, inter);
+
+        // convert magnitude to logarithmic scale to get diameter of circle
+        mag = Math.pow(10, mag);
+        mag = Math.sqrt(mag);
+
+        //largest magnitude in logarithmic scale
+        var magMax = Math.sqrt(Math.pow(10, 10));
+
+        // new coordinate offset from center of image
+        var x = webMercatorX(lng) - centerX;
+        var y = webMercatorY(lat) - centerY;
+
+        //draw circle
+        var diameter = map(mag, 0, magMax, 0, 180);
+        console.log(magcap);
+        console.log(truemag);
+        console.log("updating");
+        if (truemag < magcap) {
+            stroke(c_solid);
+            fill(c);
+            ellipse(x, y, diameter * scale, diameter * scale);
+        }
+        else {
+            console.log(truemag);
+        }
+    }
+}
