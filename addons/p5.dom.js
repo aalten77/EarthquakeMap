@@ -1,4 +1,4 @@
-/*! p5.dom.js v0.4.0 August 9, 2018 */
+/*! p5.dom.js v0.3.4 Jan 19, 2017 */
 /**
  * <p>The web is much more than just canvas and p5.dom makes it easy to interact
  * with other HTML5 objects, including text, hyperlink, image, input, video,
@@ -17,7 +17,7 @@
  * <a href='https://raw.githubusercontent.com/lmccart/p5.js/master/lib/addons/p5.dom.js'>
  * here</a>.</p>
  * <p>See <a href='https://github.com/processing/p5.js/wiki/Beyond-the-canvas'>tutorial: beyond the canvas</a>
- * for more info on how to use this library.</a>
+ * for more info on how to use this libary.</a>
  *
  * @module p5.dom
  * @submodule p5.dom
@@ -187,7 +187,7 @@
   p5.prototype._wrapElement = function(elt) {
     var children = Array.prototype.slice.call(elt.children);
     if (elt.tagName === 'INPUT' && elt.type === 'checkbox') {
-      var converted = new p5.Element(elt, this);
+      var converted = new p5.Element(elt);
       converted.checked = function() {
         if (arguments.length === 0) {
           return this.elt.checked;
@@ -200,18 +200,18 @@
       };
       return converted;
     } else if (elt.tagName === 'VIDEO' || elt.tagName === 'AUDIO') {
-      return new p5.MediaElement(elt, this);
+      return new p5.MediaElement(elt);
     } else if (elt.tagName === 'SELECT') {
-      return this.createSelect(new p5.Element(elt, this));
+      return this.createSelect(new p5.Element(elt));
     } else if (
       children.length > 0 &&
       children.every(function(c) {
         return c.tagName === 'INPUT' || c.tagName === 'LABEL';
       })
     ) {
-      return this.createRadio(new p5.Element(elt, this));
+      return this.createRadio(new p5.Element(elt));
     } else {
-      return new p5.Element(elt, this);
+      return new p5.Element(elt);
     }
   };
 
@@ -243,117 +243,12 @@
   };
 
   /**
-   * The .<a href="#/p5.Element/changed">changed()</a> function is called when the value of an
-   * element changes.
-   * This can be used to attach an element specific event listener.
-   *
-   * @method changed
-   * @param  {Function|Boolean} fxn function to be fired when the value of
-   *                                an element changes.
-   *                                if `false` is passed instead, the previously
-   *                                firing function will no longer fire.
-   * @chainable
-   * @example
-   * <div><code>
-   * var sel;
-   *
-   * function setup() {
-   *   textAlign(CENTER);
-   *   background(200);
-   *   sel = createSelect();
-   *   sel.position(10, 10);
-   *   sel.option('pear');
-   *   sel.option('kiwi');
-   *   sel.option('grape');
-   *   sel.changed(mySelectEvent);
-   * }
-   *
-   * function mySelectEvent() {
-   *   var item = sel.value();
-   *   background(200);
-   *   text("it's a " + item + '!', 50, 50);
-   * }
-   * </code></div>
-   *
-   * <div><code>
-   * var checkbox;
-   * var cnv;
-   *
-   * function setup() {
-   *   checkbox = createCheckbox(' fill');
-   *   checkbox.changed(changeFill);
-   *   cnv = createCanvas(100, 100);
-   *   cnv.position(0, 30);
-   *   noFill();
-   * }
-   *
-   * function draw() {
-   *   background(200);
-   *   ellipse(50, 50, 50, 50);
-   * }
-   *
-   * function changeFill() {
-   *   if (checkbox.checked()) {
-   *     fill(0);
-   *   } else {
-   *     noFill();
-   *   }
-   * }
-   * </code></div>
-   *
-   * @alt
-   * dropdown: pear, kiwi, grape. When selected text "its a" + selection shown.
-   *
-   */
-  p5.Element.prototype.changed = function(fxn) {
-    p5.Element._adjustListener('change', fxn, this);
-    return this;
-  };
-
-  /**
-   * The .<a href="#/p5.Element/input">input()</a> function is called when any user input is
-   * detected with an element. The input event is often used
-   * to detect keystrokes in a input element, or changes on a
-   * slider element. This can be used to attach an element specific
-   * event listener.
-   *
-   * @method input
-   * @param  {Function|Boolean} fxn function to be fired when any user input is
-   *                                detected within the element.
-   *                                if `false` is passed instead, the previously
-   *                                firing function will no longer fire.
-   * @chainable
-   * @example
-   * <div class='norender'><code>
-   * // Open your console to see the output
-   * function setup() {
-   *   var inp = createInput('');
-   *   inp.input(myInputEvent);
-   * }
-   *
-   * function myInputEvent() {
-   *   console.log('you are typing: ', this.value());
-   * }
-   * </code></div>
-   *
-   * @alt
-   * no display.
-   *
-   */
-  p5.Element.prototype.input = function(fxn) {
-    p5.Element._adjustListener('input', fxn, this);
-    return this;
-  };
-
-  /**
    * Helpers for create methods.
    */
   function addElement(elt, pInst, media) {
     var node = pInst._userNode ? pInst._userNode : document.body;
     node.appendChild(elt);
-    var c = media
-      ? new p5.MediaElement(elt, pInst)
-      : new p5.Element(elt, pInst);
+    var c = media ? new p5.MediaElement(elt) : new p5.Element(elt);
     pInst._elements.push(c);
     return c;
   }
@@ -890,80 +785,6 @@
   };
 
   /**
-   * Creates a colorPicker element in the DOM for color input.
-   * The .value() method will return a hex string (#rrggbb) of the color.
-   * The .color() method will return a p5.Color object with the current chosen color.
-   *
-   * @method createColorPicker
-   * @param {String|p5.Color} [value] default color of element
-   * @return {p5.Element} pointer to <a href="#/p5.Element">p5.Element</a> holding created node
-   * @example
-   * <div>
-   * <code>
-   * var inp1, inp2;
-   * function setup() {
-   *   createCanvas(100, 100);
-   *   background('grey');
-   *   inp1 = createColorPicker('#ff0000');
-   *   inp2 = createColorPicker(color('yellow'));
-   *   inp1.input(setShade1);
-   *   inp2.input(setShade2);
-   *   setMidShade();
-   * }
-   *
-   * function setMidShade() {
-   *   // Finding a shade between the two
-   *   var commonShade = lerpColor(inp1.color(), inp2.color(), 0.5);
-   *   fill(commonShade);
-   *   rect(20, 20, 60, 60);
-   * }
-   *
-   * function setShade1() {
-   *   setMidShade();
-   *   console.log('You are choosing shade 1 to be : ', this.value());
-   * }
-   * function setShade2() {
-   *   setMidShade();
-   *   console.log('You are choosing shade 2 to be : ', this.value());
-   * }
-   * </code>
-   * </div>
-   */
-  p5.prototype.createColorPicker = function(value) {
-    p5._validateParameters('createColorPicker', arguments);
-    var elt = document.createElement('input');
-    var self;
-    elt.type = 'color';
-    if (value) {
-      if (value instanceof p5.Color) {
-        elt.value = value.toString('#rrggbb');
-      } else {
-        p5.prototype._colorMode = 'rgb';
-        p5.prototype._colorMaxes = {
-          rgb: [255, 255, 255, 255],
-          hsb: [360, 100, 100, 1],
-          hsl: [360, 100, 100, 1]
-        };
-        elt.value = p5.prototype.color(value).toString('#rrggbb');
-      }
-    } else {
-      elt.value = '#000000';
-    }
-    self = addElement(elt, this);
-    // Method to return a p5.Color object for the given color.
-    self.color = function() {
-      if (value.mode) {
-        p5.prototype._colorMode = value.mode;
-      }
-      if (value.maxes) {
-        p5.prototype._colorMaxes = value.maxes;
-      }
-      return p5.prototype.color(this.elt.value);
-    };
-    return self;
-  };
-
-  /**
    * Creates an &lt;input&gt;&lt;/input&gt; element in the DOM for text input.
    * Use .<a href="#/p5.Element/size">size()</a> to set the display length of the box.
    * Appends to the container node if one is specified, otherwise
@@ -1032,12 +853,30 @@
     // We're simplifying life and assuming that we always
     // want to load every selected file
     function handleFileSelect(evt) {
+      function makeLoader(theFile) {
+        // Making a p5.File object
+        var p5file = new p5.File(theFile);
+        return function(e) {
+          p5file.data = e.target.result;
+          callback(p5file);
+        };
+      }
       // These are the files
       var files = evt.target.files;
       // Load each one and trigger a callback
       for (var i = 0; i < files.length; i++) {
         var f = files[i];
-        p5.File._load(f, callback);
+        var reader = new FileReader();
+
+        reader.onload = makeLoader(f);
+
+        // Text or data?
+        // This should likely be improved
+        if (f.type.indexOf('text') > -1) {
+          reader.readAsText(f);
+        } else {
+          reader.readAsDataURL(f);
+        }
       }
     }
     // Is the file stuff supported?
@@ -1092,14 +931,9 @@
     elt.addEventListener('loadedmetadata', function() {
       c.width = elt.videoWidth;
       c.height = elt.videoHeight;
-      //c.elt.playbackRate = s;
       // set elt width and height if not set
       if (c.elt.width === 0) c.elt.width = elt.videoWidth;
       if (c.elt.height === 0) c.elt.height = elt.videoHeight;
-      if (c.presetPlaybackRate) {
-        c.elt.playbackRate = c.presetPlaybackRate;
-        delete c.presetPlaybackRate;
-      }
       c.loadedmetadata = true;
     });
 
@@ -1233,8 +1067,7 @@
    * <p>Creates a new HTML5 &lt;video&gt; element that contains the audio/video
    * feed from a webcam. The element is separate from the canvas and is
    * displayed by default. The element can be hidden using .<a href="#/p5.Element/hide">hide()</a>. The feed
-   * can be drawn onto the canvas using <a href="#/p5/image">image()</a>. The loadedmetadata property can
-   * be used to detect when the element has fully loaded (see second example).</p>
+   * can be drawn onto the canvas using <a href="#/p5/image">image()</a>.</p>
    * <p>More specific properties of the feed can be passing in a Constraints object.
    * See the
    * <a href='http://w3c.github.io/mediacapture-main/getusermedia.html#media-track-constraints'> W3C
@@ -1285,20 +1118,6 @@
    *   });
    * }
    * </code></div>
-   * <code><div class='norender notest'>
-   * var capture;
-   *
-   * function setup() {
-   *   createCanvas(640, 480);
-   *   capture = createCapture(VIDEO);
-   * }
-   * function draw() {
-   *   background(0);
-   *   if (capture.loadedmetadata) {
-   *     var c = capture.get(0, 0, 100, 100);
-   *     image(c, 0, 0);
-   *   }
-   * }
    */
   p5.prototype.createCapture = function() {
     p5._validateParameters('createCapture', arguments);
@@ -1471,8 +1290,6 @@
    * div0.child('apples'); // use id
    * </code></div>
    * <div class='norender notest'><code>
-   * // this example assumes there is a div already on the page
-   * // with id "myChildDiv"
    * var div0 = createDiv('this is the parent');
    * var elt = document.getElementById('myChildDiv');
    * div0.child(elt); // use element from page
@@ -2023,7 +1840,7 @@
         this.width = this.elt.offsetWidth;
         this.height = this.elt.offsetHeight;
 
-        if (this._pInst && this._pInst._curElement) {
+        if (this._pInst) {
           // main canvas associated with p5 instance
           if (this._pInst._curElement.elt === this.elt) {
             this._pInst._setProperty('width', this.elt.offsetWidth);
@@ -2620,13 +2437,9 @@
    */
   p5.MediaElement.prototype.speed = function(val) {
     if (typeof val === 'undefined') {
-      return this.presetPlaybackRate || this.elt.playbackRate;
+      return this.elt.playbackRate;
     } else {
-      if (this.loadedmetadata) {
-        this.elt.playbackRate = val;
-      } else {
-        this.presetPlaybackRate = val;
-      }
+      this.elt.playbackRate = val;
     }
   };
 
@@ -2721,9 +2534,6 @@
     return this.elt.duration;
   };
   p5.MediaElement.prototype.pixels = [];
-  p5.MediaElement.prototype._ensureCanvas = function() {
-    if (!this.canvas) this.loadPixels();
-  };
   p5.MediaElement.prototype.loadPixels = function() {
     if (!this.canvas) {
       this.canvas = document.createElement('canvas');
@@ -2762,7 +2572,6 @@
   p5.MediaElement.prototype.updatePixels = function(x, y, w, h) {
     if (this.loadedmetadata) {
       // wait for metadata
-      this._ensureCanvas();
       p5.Renderer2D.prototype.updatePixels.call(this, x, y, w, h);
     }
     this.setModified(true);
@@ -2773,9 +2582,10 @@
       // wait for metadata
       var currentTime = this.elt.currentTime;
       if (this._pixelsTime !== currentTime) {
-        this.loadPixels();
-      } else {
-        this._ensureCanvas();
+        // if the video has changed time, then force an
+        // update to the pixels array.
+        this._pixelsDirty = true;
+        this._pixelsTime = currentTime;
       }
 
       return p5.Renderer2D.prototype.get.call(this, x, y, w, h);
@@ -2790,13 +2600,11 @@
   p5.MediaElement.prototype.set = function(x, y, imgOrCol) {
     if (this.loadedmetadata) {
       // wait for metadata
-      this._ensureCanvas();
       p5.Renderer2D.prototype.set.call(this, x, y, imgOrCol);
       this.setModified(true);
     }
   };
   p5.MediaElement.prototype.copy = function() {
-    this._ensureCanvas();
     p5.Renderer2D.prototype.copy.apply(this, arguments);
   };
   p5.MediaElement.prototype.mask = function() {
@@ -3221,27 +3029,3 @@
     this.data = undefined;
   };
 });
-
-p5.File._createLoader = function(theFile, callback) {
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    var p5file = new p5.File(theFile);
-    p5file.data = e.target.result;
-    callback(p5file);
-  };
-  return reader;
-};
-
-p5.File._load = function(f, callback) {
-  // Text or data?
-  // This should likely be improved
-  if (/^text\//.test(f.type)) {
-    p5.File._createLoader(f, callback).readAsText(f);
-  } else if (!/^(video|audio)\//.test(f.type)) {
-    p5.File._createLoader(f, callback).readAsDataURL(f);
-  } else {
-    var file = new p5.File(f);
-    file.data = URL.createObjectURL(f);
-    callback(file);
-  }
-};

@@ -22,6 +22,7 @@ var earthquakes = new Array();
 
 //constants for color gradient
 let c1, c2, c1_solid, c2_solid;
+let magScaler, diaScaler;
 
 //link to query geojson data - ref: https://earthquake.usgs.gov/fdsnws/event/1/
 //TODO: change query dynamically using time slider
@@ -138,58 +139,15 @@ function setup(){
     centerCanvas();
     myCanvas.parent('myCanvas');
 
-    //TODO: not sure if this translate is necessary - Ai-Linh
-    translate(width/2, height/2);
-    imageMode(CENTER);
-    image(mapimg, 0, 0);
+    textSize(15);
+    noStroke();
 
-    //center coordinates of image converted to Web Mercator coordinates
-    var centerX = webMercatorX(center_lng);
-    var centerY = webMercatorY(center_lat);
-    var magcap = parseFloat(document.getElementById("magnitude").getAttribute("value"));
-    var scale = parseInt(document.getElementById("scale").getAttribute("value"));
+    magScaler = createSlider(0, 10, 10);
+    magScaler.position(20, 50);
+    diaScaler = createSlider(1, 10, 1);
+    diaScaler.position(20, 100);
 
-
-    console.log(earthquakes);
-    //iterate line by line through CSV to get data
-    for (var i = 0; i < earthquakes.length; i++){
-        //var data = earthquakes[i].split(/,/); //regular expression for a single comma
-        //console.log(data);
-
-        var lat = earthquakes[i]['lat'];
-        var lng = earthquakes[i]['lng'];
-        var mag = earthquakes[i]['mag'];
-        var truemag = parseFloat(earthquakes[i]['mag']);
-
-        //color gradient mapping based on magnitude
-        let inter = map(mag, 0, 10, 0, 1);
-        let c = lerpColor(c1, c2, inter);
-        let c_solid = lerpColor(c1_solid, c2_solid, inter);
-
-        // convert magnitude to logarithmic scale to get diameter of circle
-        mag = Math.pow(10, mag);
-        mag = Math.sqrt(mag);
-
-        //largest magnitude in logarithmic scale
-        var magMax = Math.sqrt(Math.pow(10,10));
-
-        // new coordinate offset from center of image
-        var x = webMercatorX(lng) - centerX;
-        var y = webMercatorY(lat) - centerY;
-
-        //draw circle
-        var diameter = map(mag, 0, magMax, 0, 180);
-        console.log(magcap);
-        console.log(truemag);
-        if (truemag < magcap) {
-            stroke(c_solid);
-            fill(c);
-            ellipse(x, y, diameter * scale, diameter * scale);
-        }
-        else {
-            console.log(truemag);
-        }
-    }
+    draw();
 }
 
 /**
@@ -203,36 +161,24 @@ function windowResized() {
 }
 
 /**
- * Updates values from slider input
+ * Redraws the canvas on update.
  * @author Jason Do <jason.do@sjsu.edu>
  */
-function updateTextInput(val) {
-    console.log("hello");
-    document.getElementById('magnitude').addEventListener('change', function () {
-        this.setAttribute('value', this.value);
-    });
-    document.getElementById('scale').addEventListener('change', function () {
-        this.setAttribute('value', this.value);
-    });
-}
-
-/**
- * Redraws canvas when update button is pressed.
- * @author Jason Do <jason.do@sjsu.edu>
- */
-function update() {
+function draw() {
     console.log("updating");
     const context = canvas.getContext('2d');
-    context.clearRect(-width/2, -height/2, canvas.width, canvas.height);
+    context.clearRect(-width / 2, -height / 2, canvas.width, canvas.height);
 
+    //TODO: not sure if this translate is necessary - Ai-Linh
+    translate(width / 2, height / 2);
+    imageMode(CENTER);
     image(mapimg, 0, 0);
-    //earthquakes = loadStrings('all_month_current.csv');
     console.log("updating");
 
     var centerX = webMercatorX(center_lng);
     var centerY = webMercatorY(center_lat);
-    var magcap = parseFloat(document.getElementById("magnitude").getAttribute("value"));
-    var scale = parseInt(document.getElementById("scale").getAttribute("value"));
+    var magcap = magScaler.value();
+    var scale = diaScaler.value();
     console.log(magcap);
     console.log(scale);
 
