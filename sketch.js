@@ -21,8 +21,11 @@ var zoom = 1;
 var earthquakes = new Array();
 
 //constants for color gradient
-let c1, c2, c1_solid, c2_solid;
+let c1, c2, c3, c1_solid, c2_solid, c3_solid;
 let magScaler, diaScaler;
+
+//var selected = false;
+//var selectedid;
 
 //link to query geojson data - ref: https://earthquake.usgs.gov/fdsnws/event/1/
 //TODO: change query dynamically using time slider
@@ -51,7 +54,8 @@ function createFeatures(obj){
             lng: myArr[i]['geometry']['coordinates'][0],
             mag: myArr[i]['properties']['mag'],
             time: datetime.toString(),
-            title: myArr[i]['properties']['title']
+            title: myArr[i]['properties']['title'], 
+            selected: false,
         };
         earthquakes.push(featureObj);
     }
@@ -139,8 +143,11 @@ function setup(){
     //Define colors - https://uigradients.com/#AzurePop
     c1 = color('#89fffdbf'); //light blue w/ 75% transparency - ref: https://css-tricks.com/8-digit-hex-codes/
     c2 = color('#ef32d9bf'); //magenta w/ 75% transparency - ref: https://css-tricks.com/8-digit-hex-codes/
+    c3 = color('#00FFFF')
+
     c1_solid = color('#89fffd'); //light blue
     c2_solid = color('#ef32d9'); //magenta
+    c3_solid = color('#00FFFF')
 
     //canvas with image centerpoint as (0,0). Image is then translated to middle of canvas.
     myCanvas = createCanvas(windowWidth, windowHeight);
@@ -200,6 +207,7 @@ function draw() {
         var lng = earthquakes[i]['lng'];
         var mag = earthquakes[i]['mag'];
         var truemag = parseFloat(earthquakes[i]['mag']);
+        let select = earthquakes[i]['selected'];
 
         //color gradient mapping based on magnitude
         let inter = map(mag, 0, 10, 0, 1);
@@ -223,9 +231,19 @@ function draw() {
         // console.log(truemag);
         // console.log("updating");
         if (truemag < magcap) {
-            stroke(c_solid);
-            fill(c);
-            ellipse(x, y, diameter * scale, diameter * scale);
+            if (!select) {
+                stroke(c_solid);
+                fill(c);
+                //console.log("normie");
+                ellipse(x, y, diameter * scale, diameter * scale);
+            }
+            else{
+                stroke(c3_solid);
+                fill(c3);
+                console.log("speshul");
+                ellipse(x, y, diameter * scale, diameter * scale);
+            }
+            //ellipse(x, y, diameter * scale, diameter * scale);
         }
         else {
             // console.log(truemag);
@@ -273,9 +291,17 @@ function mousePressed() {
         var diameter = map(mag, 0, magMax, 0, 180);
         //ellipse(mX, mY, 100, 100);
         //ellipse(x, y, diameter * 10, diameter * 10);
-        if (distance(x, y, mX - (width / 2), mY - (height / 2)) < diameter * (scale/2)) {
+        if (distance(x, y, mX - (width / 2), mY - (height / 2)) < diameter * (scale / 2)) {
             ellipse(mX - (width / 2), mY - (height / 2), 100, 100);
             console.log("HIT!");
+            earthquakes[i]['selected'] = true;
+            console.log(earthquakes[i]['selected']);
+        }
+        else {
+            earthquakes[i]['selected'] = false;
+        }
+        if (earthquakes[i]['selected']) {
+            break;
         }
     }
 }
