@@ -24,8 +24,8 @@ var earthquakes = new Array();
 let c1, c2, c3, c1_solid, c2_solid, c3_solid;
 let magScaler, diaScaler;
 
-//var selected = false;
-//var selectedid;
+//keep track of selected bubble
+var selectedId = 0;
 
 //link to query geojson data - ref: https://earthquake.usgs.gov/fdsnws/event/1/
 //TODO: change query dynamically using time slider
@@ -143,7 +143,7 @@ function setup(){
     //Define colors - https://uigradients.com/#AzurePop
     c1 = color('#89fffdbf'); //light blue w/ 75% transparency - ref: https://css-tricks.com/8-digit-hex-codes/
     c2 = color('#ef32d9bf'); //magenta w/ 75% transparency - ref: https://css-tricks.com/8-digit-hex-codes/
-    c3 = color('#00FFFF')
+    c3 = color('#00FFFFBF')
 
     c1_solid = color('#89fffd'); //light blue
     c2_solid = color('#ef32d9'); //magenta
@@ -190,23 +190,23 @@ function draw() {
     image(mapimg, 0, 0);
     //console.log("updating");
 
-    var centerX = webMercatorX(center_lng);
-    var centerY = webMercatorY(center_lat);
-    var magcap = magScaler.value();
-    var scale = diaScaler.value();
+    let centerX = webMercatorX(center_lng);
+    let centerY = webMercatorY(center_lat);
+    let magcap = magScaler.value();
+    let scale = diaScaler.value();
     // console.log(magcap);
     // console.log(scale);
     //
     // console.log(earthquakes.length);
 
     //iterate line by line through CSV to get data
-    for (var i = 0; i < earthquakes.length; i++) {
+    for (let i = 0; i < earthquakes.length; i++) {
         //var data = earthquakes[i].split(/,/); //regular expression for a single comma
         //console.log(data);
-        var lat = earthquakes[i]['lat'];
-        var lng = earthquakes[i]['lng'];
-        var mag = earthquakes[i]['mag'];
-        var truemag = parseFloat(earthquakes[i]['mag']);
+        let lat = earthquakes[i]['lat'];
+        let lng = earthquakes[i]['lng'];
+        let mag = earthquakes[i]['mag'];
+        let truemag = parseFloat(earthquakes[i]['mag']);
         let select = earthquakes[i]['selected'];
 
         //color gradient mapping based on magnitude
@@ -219,89 +219,84 @@ function draw() {
         mag = Math.sqrt(mag);
 
         //largest magnitude in logarithmic scale
-        var magMax = Math.sqrt(Math.pow(10, 10));
+        let magMax = Math.sqrt(Math.pow(10, 10));
 
         // new coordinate offset from center of image
-        var x = webMercatorX(lng) - centerX;
-        var y = webMercatorY(lat) - centerY;
+        let x = webMercatorX(lng) - centerX;
+        let y = webMercatorY(lat) - centerY;
 
         //draw circle
-        var diameter = map(mag, 0, magMax, 0, 180);
+        let diameter = map(mag, 0, magMax, 0, 180);
         // console.log(magcap);
         // console.log(truemag);
         // console.log("updating");
         if (truemag < magcap) {
+            //change color based on selection
             if (!select) {
                 stroke(c_solid);
                 fill(c);
-                //console.log("normie");
                 ellipse(x, y, diameter * scale, diameter * scale);
             }
             else{
                 stroke(c3_solid);
                 fill(c3);
-                console.log("speshul");
                 ellipse(x, y, diameter * scale, diameter * scale);
             }
-            //ellipse(x, y, diameter * scale, diameter * scale);
-        }
-        else {
-            // console.log(truemag);
         }
     }
 }
 
+/**
+ * Highlights selected circle based on mouse press location.
+ *
+ * @author Jason Do <jason.do@sjsu.edu>
+ * @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
+ */
 function mousePressed() {
     translate(-width / 2, -height / 2);
-    var mX = mouseX;
-    var mY = mouseY;
+    let mX = mouseX;
+    let mY = mouseY;
     translate(width / 2, height / 2);
     //ellipse(mX - (width/2), mY - (height/2), 100, 100);
 
-    var centerX = webMercatorX(center_lng);
-    var centerY = webMercatorY(center_lat);
-    var magcap = magScaler.value();
-    var scale = diaScaler.value();
+    let centerX = webMercatorX(center_lng);
+    let centerY = webMercatorY(center_lat);
+    let scale = diaScaler.value();
 
-    for (var i = 0; i < earthquakes.length; i++) {
-        //var data = earthquakes[i].split(/,/); //regular expression for a single comma
-        //console.log(data);
-        var lat = earthquakes[i]['lat'];
-        var lng = earthquakes[i]['lng'];
-        var mag = earthquakes[i]['mag'];
-        var truemag = parseFloat(earthquakes[i]['mag']);
+    //reset the selected circle to false
+    if (earthquakes[selectedId]['selected']){
+        earthquakes[selectedId]['selected'] = false;
+    }
 
-        //color gradient mapping based on magnitude
-        let inter = map(mag, 0, 10, 0, 1);
-        let c = lerpColor(c1, c2, inter);
-        let c_solid = lerpColor(c1_solid, c2_solid, inter);
+    //go through circles backwards based on draw - select largest diameter circle on top
+    for (let i = earthquakes.length-1; i >= 0; i--) {
+        let lat = earthquakes[i]['lat'];
+        let lng = earthquakes[i]['lng'];
+        let mag = earthquakes[i]['mag'];
 
         // convert magnitude to logarithmic scale to get diameter of circle
         mag = Math.pow(10, mag);
         mag = Math.sqrt(mag);
 
         //largest magnitude in logarithmic scale
-        var magMax = Math.sqrt(Math.pow(10, 10));
+        let magMax = Math.sqrt(Math.pow(10, 10));
 
         // new coordinate offset from center of image
-        var x = webMercatorX(lng) - centerX;
-        var y = webMercatorY(lat) - centerY;
+        let x = webMercatorX(lng) - centerX;
+        let y = webMercatorY(lat) - centerY;
 
-        //draw circle
-        var diameter = map(mag, 0, magMax, 0, 180);
-        //ellipse(mX, mY, 100, 100);
-        //ellipse(x, y, diameter * 10, diameter * 10);
+        //diameter of circle
+        let diameter = map(mag, 0, magMax, 0, 180);
+
+        //check if click within bubble and updated selected in earthquakes array
         if (distance(x, y, mX - (width / 2), mY - (height / 2)) < diameter * (scale / 2)) {
             ellipse(mX - (width / 2), mY - (height / 2), 100, 100);
-            console.log("HIT!");
             earthquakes[i]['selected'] = true;
-            console.log(earthquakes[i]['selected']);
+            selectedId = i;
+            break;
         }
         else {
             earthquakes[i]['selected'] = false;
-        }
-        if (earthquakes[i]['selected']) {
-            break;
         }
     }
 }
