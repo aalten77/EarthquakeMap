@@ -4,6 +4,9 @@
  *
  * Data collected from USGS Earthquake Hazards Program: https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php
  *
+ * @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
+ * @author Jason Do <jason.do@sjsu.edu>
+ *
  */
 
 //holders for image and canvas
@@ -41,8 +44,7 @@ var fontsize = 10;
 
 /**
  * Make HTTP Request to link for geojson of earthquakes. Store the features as a featureObj in earthquakes array.
- *
- * @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
+ * @param {text} obj - geojson
  */
 function createFeatures(obj){
     let bbox = obj['bbox'];
@@ -74,7 +76,7 @@ function createFeatures(obj){
 
 /**
  *  Preload Google Map Static API and earthquake data.
- *  @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
+ *
  */
 function preload(){
     //load map static image
@@ -98,9 +100,8 @@ function preload(){
 
 /**
  * Converts longitude into Web Mercator X coordinate.
- * @author Daniel Shiffman <https://thecodingtrain.com>
  * @param {float} lng - Longitude in decimal degrees WGS84.
- * @returns {number}
+ * @returns {number} - Web Mercator X coordinate
  */
 function webMercatorX(lng){
     lng = radians(lng);
@@ -111,9 +112,8 @@ function webMercatorX(lng){
 
 /**
  * Converts latitude into Web Mercator Y coordinate.
- * @author Daniel Shiffman <https://thecodingtrain.com>
  * @param {float} lat - Latitude in decimal degrees WGS84.
- * @returns {number}
+ * @returns {number} - Web Mercator Y coordinate
  */
 function webMercatorY(lat){
     lat = radians(lat);
@@ -127,7 +127,6 @@ function webMercatorY(lat){
  * Make canvas center of screen.
  * https://github.com/processing/p5.js/wiki/Positioning-your-canvas
  *
- * @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
  */
 function centerCanvas() {
     var x = (windowWidth - width)/2;
@@ -140,8 +139,6 @@ function centerCanvas() {
  *  Data points based on magnitude of the earthquake.
  *  Google Map tile placed in middle of canvas. Map tile will always be 640x640.
  *
- *  @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
- *  @author Jason Do <jason.do@sjsu.edu>
  */
 function setup(){
     //Define colors - https://uigradients.com/#AzurePop
@@ -160,15 +157,12 @@ function setup(){
     centerCanvas();
     myCanvas.parent('myCanvas');
 
-    // textSize(15);
-    //noStroke();
-
     //setup for text font
     textFont('Helvetica');
     textSize(fontsize);
     textAlign(CENTER, CENTER);
 
-
+    //magnitude and diameter sliders
     magScaler = createSlider(0, 10, 10);
     magScaler.position(20, 50);
     diaScaler = createSlider(1, 10, 1);
@@ -179,7 +173,6 @@ function setup(){
 
 /**
  * Execute functions when window is resized.
- * @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
  */
 function windowResized() {
     centerCanvas();
@@ -189,8 +182,6 @@ function windowResized() {
 
 /**
  * Redraws the canvas on update.
- * @author Jason Do <jason.do@sjsu.edu>
- * @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
  */
 function draw() {
     //console.log("updating");
@@ -222,7 +213,7 @@ function draw() {
         let truemag = parseFloat(earthquakes[i]['mag']);
         let select = earthquakes[i]['selected'];
 
-        //color gradient mapping based on magnitude
+        //color gradient mapping based on magnitude 3 - 10
         let inter = map(mag, 3, 10, 0, 1);
         let c = lerpColor(c1, c2, inter);
         let c_solid = lerpColor(c1_solid, c2_solid, inter);
@@ -278,7 +269,6 @@ function draw() {
 /**
  * Draw informative text based on circle position.
  *
- * @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
  * @param {int} x - screen coordinate x
  * @param {int} y - screen coordinate y
  */
@@ -291,8 +281,6 @@ function drawWords(x, y){
 /**
  * Highlights selected circle based on mouse press location.
  *
- * @author Jason Do <jason.do@sjsu.edu>
- * @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
  */
 function mousePressed() {
     let centerX = webMercatorX(center_lng);
@@ -340,7 +328,6 @@ function mousePressed() {
 /**
  * Euclidean distance between two points.
  *
- * @author Jason Do <jason.do@sjsu.edu>
  * @param {float} x1 - x coordinate point 1
  * @param {float} y1 - y coordinate point 1
  * @param {float} x2 - x coordinate point 2
