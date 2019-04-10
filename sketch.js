@@ -241,17 +241,20 @@ function draw() {
                 if (distance(x, y, mouseX - (width / 2), mouseY - (height / 2)) < diameter * (scale / 2)) {
                     stroke(c4_solid);
                     fill(c4);
+                    ellipse(x, y, (diameter * scale) + (sin(frameCount)*2), (diameter * scale) + (sin(frameCount)*2));
                 }else{
                     stroke(c_solid);
                     fill(c);
+                    ellipse(x, y, diameter * scale, diameter * scale);
                 }
             }
             else{
                 stroke(c3_solid);
                 fill(c3);
+                ellipse(x, y, diameter * scale, diameter * scale);
             }
 
-            ellipse(x, y, diameter * scale, diameter * scale);
+
 
         }
     }
