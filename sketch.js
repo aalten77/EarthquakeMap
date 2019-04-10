@@ -27,13 +27,17 @@ let magScaler, diaScaler;
 //keep track of selected bubble
 var selectedId = 0;
 
+
 //link to query geojson data - ref: https://earthquake.usgs.gov/fdsnws/event/1/
 //TODO: change query dynamically using time slider
-//var link = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2019-03-01&endtime=2019-03-31&minmagnitude=3.5&minlatitude=-90&minlongitude=-180&maxlatitude=90&maxlongitude=180";
-var link = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson";
+var link = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2019-03-01&endtime=2019-03-31&minmagnitude=3.5&minlatitude=-90&minlongitude=-180&maxlatitude=90&maxlongitude=180";
+//var link = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson";
 
 //holder to make HTTP requests
 var xhr = new XMLHttpRequest();
+
+//fontsize
+var fontsize = 10;
 
 /**
  * Make HTTP Request to link for geojson of earthquakes. Store the features as a featureObj in earthquakes array.
@@ -156,8 +160,14 @@ function setup(){
     centerCanvas();
     myCanvas.parent('myCanvas');
 
-    textSize(15);
-    noStroke();
+    // textSize(15);
+    //noStroke();
+
+    //setup for text font
+    textFont('Helvetica');
+    textSize(fontsize);
+    textAlign(CENTER, CENTER);
+
 
     magScaler = createSlider(0, 10, 10);
     magScaler.position(20, 50);
@@ -213,7 +223,7 @@ function draw() {
         let select = earthquakes[i]['selected'];
 
         //color gradient mapping based on magnitude
-        let inter = map(mag, 0, 10, 0, 1);
+        let inter = map(mag, 3, 10, 0, 1);
         let c = lerpColor(c1, c2, inter);
         let c_solid = lerpColor(c1_solid, c2_solid, inter);
 
@@ -249,6 +259,11 @@ function draw() {
                 }
             }
             else{
+                //draw words when circle is selected
+                textAlign(CENTER);
+                drawWords(x, y - (diameter * scale) - (fontsize*2));
+
+                //hilight circle cyan
                 stroke(c3_solid);
                 fill(c3);
                 ellipse(x, y, diameter * scale, diameter * scale);
@@ -258,6 +273,19 @@ function draw() {
 
         }
     }
+}
+
+/**
+ * Draw informative text based on circle position.
+ *
+ * @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
+ * @param {int} x - screen coordinate x
+ * @param {int} y - screen coordinate y
+ */
+function drawWords(x, y){
+    stroke(c4_solid);
+    fill(255);
+    text(earthquakes[selectedId]['title'] + '\nmagintude: ' + earthquakes[selectedId]['mag'] + '\ndatetime: ' + earthquakes[selectedId]['time'], x, y);
 }
 
 /**
