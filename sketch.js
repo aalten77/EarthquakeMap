@@ -275,6 +275,7 @@ function mousePressed() {
         //ellipse(x, y, diameter * 10, diameter * 10);
         if (distance(x, y, mX - (width / 2), mY - (height / 2)) < diameter * (scale/2)) {
             ellipse(mX - (width / 2), mY - (height / 2), 100, 100);
+            console.log("HIT!");
         }
     }
 }
