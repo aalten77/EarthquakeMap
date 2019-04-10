@@ -58,7 +58,7 @@ function createFeatures(obj){
 
     // sort earthquakes from greatest to least magnitude
     earthquakes.sort(function(a, b){
-        return b.mag - a.mag;
+        return a.mag - b.mag;
     });
 
     console.log(earthquakes);
