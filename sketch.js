@@ -180,6 +180,8 @@ function windowResized() {
     setup();
 }
 
+
+//TODO: fix words that are drawing outside of web map tile (canvas)
 /**
  * Redraws the canvas on update.
  */
