@@ -21,7 +21,7 @@ var zoom = 1;
 var earthquakes = new Array();
 
 //constants for color gradient
-let c1, c2, c3, c1_solid, c2_solid, c3_solid;
+let c1, c2, c3, c4, c1_solid, c2_solid, c3_solid, c4_solid;
 let magScaler, diaScaler;
 
 //keep track of selected bubble
@@ -60,9 +60,9 @@ function createFeatures(obj){
         earthquakes.push(featureObj);
     }
 
-    // sort earthquakes from least to greatest magnitude
+    // sort earthquakes from greatest to least magnitude
     earthquakes.sort(function(a, b){
-        return a.mag - b.mag;
+        return b.mag - a.mag;
     });
 
     console.log(earthquakes);
@@ -143,11 +143,13 @@ function setup(){
     //Define colors - https://uigradients.com/#AzurePop
     c1 = color('#89fffdbf'); //light blue w/ 75% transparency - ref: https://css-tricks.com/8-digit-hex-codes/
     c2 = color('#ef32d9bf'); //magenta w/ 75% transparency - ref: https://css-tricks.com/8-digit-hex-codes/
-    c3 = color('#00FFFFBF')
+    c3 = color('#00FFFFBF'); //cyan w/ 75% transparency
+    c4 = color('#0080ffbf'); //blueish w/ 75% transparency
 
     c1_solid = color('#89fffd'); //light blue
     c2_solid = color('#ef32d9'); //magenta
-    c3_solid = color('#00FFFF')
+    c3_solid = color('#00FFFF');
+    c4_solid = color('#0080ffbf'); //blueish
 
     //canvas with image centerpoint as (0,0). Image is then translated to middle of canvas.
     myCanvas = createCanvas(windowWidth, windowHeight);
@@ -201,7 +203,7 @@ function draw() {
     // console.log(earthquakes.length);
 
     //iterate line by line through CSV to get data
-    for (let i = 0; i < earthquakes.length; i++) {
+    for (let i = earthquakes.length - 1; i >= 0; i--) {
         //var data = earthquakes[i].split(/,/); //regular expression for a single comma
         //console.log(data);
         let lat = earthquakes[i]['lat'];
@@ -234,15 +236,38 @@ function draw() {
         if (truemag < magcap) {
             //change color based on selection
             if (!select) {
-                stroke(c_solid);
-                fill(c);
-                ellipse(x, y, diameter * scale, diameter * scale);
+                //change color on hover over
+                //TODO: Fix color on hover over
+                if (distance(x, y, mouseX - (width / 2), mouseY - (height / 2)) < diameter * (scale / 2)) {
+                    stroke(c4_solid);
+                    fill(c4);
+                    ellipse(x, y, diameter * scale, diameter * scale);;
+                }else{
+                    stroke(c_solid);
+                    fill(c);
+                    ellipse(x, y, diameter * scale, diameter * scale);
+                }
             }
             else{
                 stroke(c3_solid);
                 fill(c3);
                 ellipse(x, y, diameter * scale, diameter * scale);
             }
+
+            // if (distance(x, y, mouseX - (width / 2), mouseY - (height / 2)) < diameter * (scale / 2)) {
+            //     if (!select) {
+            //         stroke(c4_solid);
+            //         fill(c4);
+            //         //ellipse(x, y, diameter * scale, diameter * scale);
+            //     }else{
+            //         stroke(c3_solid);
+            //         fill(c3);
+            //     }
+            // } else{
+            //     stroke(c_solid);
+            //     fill(c);
+            // }
+            // ellipse(x, y, diameter * scale, diameter * scale);
         }
     }
 }
@@ -263,8 +288,8 @@ function mousePressed() {
         earthquakes[selectedId]['selected'] = false;
     }
 
-    //go through circles backwards based on draw - select largest diameter circle on top
-    for (let i = earthquakes.length-1; i >= 0; i--) {
+    //go through circles based on draw - select largest diameter circle on top
+    for (let i = 0; i < earthquakes.length; i++) {
         let lat = earthquakes[i]['lat'];
         let lng = earthquakes[i]['lng'];
         let mag = earthquakes[i]['mag'];
