@@ -26,7 +26,8 @@ let magScaler, diaScaler;
 
 //link to query geojson data - ref: https://earthquake.usgs.gov/fdsnws/event/1/
 //TODO: change query dynamically using time slider
-var link = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2019-03-01&endtime=2019-03-31&minmagnitude=3.5&minlatitude=-90&minlongitude=-180&maxlatitude=90&maxlongitude=180";
+//var link = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2019-03-01&endtime=2019-03-31&minmagnitude=3.5&minlatitude=-90&minlongitude=-180&maxlatitude=90&maxlongitude=180";
+var link = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson";
 
 //holder to make HTTP requests
 var xhr = new XMLHttpRequest();
@@ -48,7 +49,8 @@ function createFeatures(obj){
             lat: myArr[i]['geometry']['coordinates'][1],
             lng: myArr[i]['geometry']['coordinates'][0],
             mag: myArr[i]['properties']['mag'],
-            time: myArr[i]['properties']['time'] //time is in milliseconds from 1970-01-01T00:00:00.000Z
+            time: myArr[i]['properties']['time'], //time is in milliseconds from 1970-01-01T00:00:00.000Z
+            title: myArr[i]['properties']['title']
         };
         earthquakes.push(featureObj);
     }
