@@ -26,7 +26,8 @@ let magScaler, diaScaler;
 
 //link to query geojson data - ref: https://earthquake.usgs.gov/fdsnws/event/1/
 //TODO: change query dynamically using time slider
-var link = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2019-03-01&endtime=2019-03-31&minmagnitude=5&minlatitude=-90&minlongitude=-180&maxlatitude=90&maxlongitude=180";
+//var link = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2019-03-01&endtime=2019-03-31&minmagnitude=3.5&minlatitude=-90&minlongitude=-180&maxlatitude=90&maxlongitude=180";
+var link = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson";
 
 //holder to make HTTP requests
 var xhr = new XMLHttpRequest();
@@ -38,20 +39,27 @@ var xhr = new XMLHttpRequest();
  */
 function createFeatures(obj){
     let bbox = obj['bbox'];
-    console.log(bbox);
+    //console.log(bbox);
     var myArr = obj['features'];
     for(var i = 0; i < myArr.length; i++){
 
         //store lat, lng, mag, and time
         //ref on geojson obj - https://earthquake.usgs.gov/data/comcat/data-eventterms.php#time
+        let datetime = new Date(myArr[i]['properties']['time']); //time is in milliseconds from 1970-01-01T00:00:00.000Z
         let featureObj = {
             lat: myArr[i]['geometry']['coordinates'][1],
             lng: myArr[i]['geometry']['coordinates'][0],
             mag: myArr[i]['properties']['mag'],
-            time: myArr[i]['properties']['time'] //time is in milliseconds from 1970-01-01T00:00:00.000Z
+            time: datetime.toString(),
+            title: myArr[i]['properties']['title']
         };
         earthquakes.push(featureObj);
     }
+
+    // sort earthquakes from least to greatest magnitude
+    earthquakes.sort(function(a, b){
+        return a.mag - b.mag;
+    });
 
     console.log(earthquakes);
 }
@@ -165,7 +173,7 @@ function windowResized() {
  * @author Jason Do <jason.do@sjsu.edu>
  */
 function draw() {
-    console.log("updating");
+    //console.log("updating");
     const context = canvas.getContext('2d');
     context.clearRect(-width / 2, -height / 2, canvas.width, canvas.height);
 
@@ -173,15 +181,16 @@ function draw() {
     translate(width / 2, height / 2);
     imageMode(CENTER);
     image(mapimg, 0, 0);
+    //console.log("updating");
 
     var centerX = webMercatorX(center_lng);
     var centerY = webMercatorY(center_lat);
     var magcap = magScaler.value();
     var scale = diaScaler.value();
-    console.log(magcap);
-    console.log(scale);
-
-    console.log(earthquakes.length);
+    // console.log(magcap);
+    // console.log(scale);
+    //
+    // console.log(earthquakes.length);
 
     //iterate line by line through CSV to get data
     for (var i = 0; i < earthquakes.length; i++) {
@@ -210,16 +219,16 @@ function draw() {
 
         //draw circle
         var diameter = map(mag, 0, magMax, 0, 180);
-        console.log(magcap);
-        console.log(truemag);
-        console.log("updating");
+        // console.log(magcap);
+        // console.log(truemag);
+        // console.log("updating");
         if (truemag < magcap) {
             stroke(c_solid);
             fill(c);
             ellipse(x, y, diameter * scale, diameter * scale);
         }
         else {
-            console.log(truemag);
+            // console.log(truemag);
         }
     }
 }
