@@ -26,7 +26,7 @@ let magScaler, diaScaler;
 
 //link to query geojson data - ref: https://earthquake.usgs.gov/fdsnws/event/1/
 //TODO: change query dynamically using time slider
-var link = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2019-03-01&endtime=2019-03-31&minmagnitude=3.5&minlatitude=-90&minlongitude=-180&maxlatitude=90&maxlongitude=180";
+var link = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2019-03-01&endtime=2019-03-31&minmagnitude=5&minlatitude=-90&minlongitude=-180&maxlatitude=90&maxlongitude=180";
 
 //holder to make HTTP requests
 var xhr = new XMLHttpRequest();
@@ -173,7 +173,6 @@ function draw() {
     translate(width / 2, height / 2);
     imageMode(CENTER);
     image(mapimg, 0, 0);
-    console.log("updating");
 
     var centerX = webMercatorX(center_lng);
     var centerY = webMercatorY(center_lat);
@@ -223,4 +222,54 @@ function draw() {
             console.log(truemag);
         }
     }
+}
+
+function mousePressed() {
+    translate(-width / 2, -height / 2);
+    var mX = mouseX;
+    var mY = mouseY;
+    translate(width / 2, height / 2);
+    //ellipse(mX - (width/2), mY - (height/2), 100, 100);
+
+    var centerX = webMercatorX(center_lng);
+    var centerY = webMercatorY(center_lat);
+    var magcap = magScaler.value();
+    var scale = diaScaler.value();
+
+    for (var i = 0; i < earthquakes.length; i++) {
+        //var data = earthquakes[i].split(/,/); //regular expression for a single comma
+        //console.log(data);
+        var lat = earthquakes[i]['lat'];
+        var lng = earthquakes[i]['lng'];
+        var mag = earthquakes[i]['mag'];
+        var truemag = parseFloat(earthquakes[i]['mag']);
+
+        //color gradient mapping based on magnitude
+        let inter = map(mag, 0, 10, 0, 1);
+        let c = lerpColor(c1, c2, inter);
+        let c_solid = lerpColor(c1_solid, c2_solid, inter);
+
+        // convert magnitude to logarithmic scale to get diameter of circle
+        mag = Math.pow(10, mag);
+        mag = Math.sqrt(mag);
+
+        //largest magnitude in logarithmic scale
+        var magMax = Math.sqrt(Math.pow(10, 10));
+
+        // new coordinate offset from center of image
+        var x = webMercatorX(lng) - centerX;
+        var y = webMercatorY(lat) - centerY;
+
+        //draw circle
+        var diameter = map(mag, 0, magMax, 0, 180);
+        //ellipse(mX, mY, 100, 100);
+        //ellipse(x, y, diameter * 10, diameter * 10);
+        if (distance(x, y, mX - (width / 2), mY - (height / 2)) < diameter * (scale/2)) {
+            ellipse(mX - (width / 2), mY - (height / 2), 100, 100);
+        }
+    }
+}
+
+function distance(x1, y1, x2, y2) {
+    return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
 }
