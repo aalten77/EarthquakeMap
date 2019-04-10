@@ -60,9 +60,9 @@ function createFeatures(obj){
         earthquakes.push(featureObj);
     }
 
-    // sort earthquakes from greatest to least magnitude
+    // sort earthquakes from least to greatest magnitude
     earthquakes.sort(function(a, b){
-        return b.mag - a.mag;
+        return a.mag - b.mag;
     });
 
     console.log(earthquakes);
@@ -203,7 +203,7 @@ function draw() {
     // console.log(earthquakes.length);
 
     //iterate line by line through CSV to get data
-    for (let i = earthquakes.length - 1; i >= 0; i--) {
+    for (let i = 0; i < earthquakes.length; i++) {
         //var data = earthquakes[i].split(/,/); //regular expression for a single comma
         //console.log(data);
         let lat = earthquakes[i]['lat'];
@@ -241,33 +241,18 @@ function draw() {
                 if (distance(x, y, mouseX - (width / 2), mouseY - (height / 2)) < diameter * (scale / 2)) {
                     stroke(c4_solid);
                     fill(c4);
-                    ellipse(x, y, diameter * scale, diameter * scale);;
                 }else{
                     stroke(c_solid);
                     fill(c);
-                    ellipse(x, y, diameter * scale, diameter * scale);
                 }
             }
             else{
                 stroke(c3_solid);
                 fill(c3);
-                ellipse(x, y, diameter * scale, diameter * scale);
             }
 
-            // if (distance(x, y, mouseX - (width / 2), mouseY - (height / 2)) < diameter * (scale / 2)) {
-            //     if (!select) {
-            //         stroke(c4_solid);
-            //         fill(c4);
-            //         //ellipse(x, y, diameter * scale, diameter * scale);
-            //     }else{
-            //         stroke(c3_solid);
-            //         fill(c3);
-            //     }
-            // } else{
-            //     stroke(c_solid);
-            //     fill(c);
-            // }
-            // ellipse(x, y, diameter * scale, diameter * scale);
+            ellipse(x, y, diameter * scale, diameter * scale);
+
         }
     }
 }
@@ -289,7 +274,7 @@ function mousePressed() {
     }
 
     //go through circles based on draw - select largest diameter circle on top
-    for (let i = 0; i < earthquakes.length; i++) {
+    for (let i = earthquakes.length - 1; i >= 0; i--) {
         let lat = earthquakes[i]['lat'];
         let lng = earthquakes[i]['lng'];
         let mag = earthquakes[i]['mag'];
