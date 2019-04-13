@@ -7,6 +7,9 @@
  * @author Ai-Linh Alten <ai-linh.alten@sjsu.edu>
  * @author Jason Do <jason.do@sjsu.edu>
  *
+ * The Coding Train - Earthquake Viz:
+ * @author Daniel Shiffman <https://thecodingtrain.com/CodingChallenges/057-mapping-earthquake-data.html>
+ *
  */
 
 //holders for image and canvas
@@ -47,8 +50,6 @@ var fontsize = 10;
  * @param {text} obj - geojson
  */
 function createFeatures(obj){
-    let bbox = obj['bbox'];
-    //console.log(bbox);
     var myArr = obj['features'];
     for(var i = 0; i < myArr.length; i++){
 
@@ -71,7 +72,6 @@ function createFeatures(obj){
         return a.mag - b.mag;
     });
 
-    console.log(earthquakes);
 }
 
 /**
@@ -186,7 +186,7 @@ function windowResized() {
  * Redraws the canvas on update.
  */
 function draw() {
-    //console.log("updating");
+
     const context = canvas.getContext('2d');
     context.clearRect(-width / 2, -height / 2, canvas.width, canvas.height);
 
@@ -194,21 +194,14 @@ function draw() {
     translate(width / 2, height / 2);
     imageMode(CENTER);
     image(mapimg, 0, 0);
-    //console.log("updating");
 
     let centerX = webMercatorX(center_lng);
     let centerY = webMercatorY(center_lat);
     let magcap = magScaler.value();
     let scale = diaScaler.value();
-    // console.log(magcap);
-    // console.log(scale);
-    //
-    // console.log(earthquakes.length);
 
     //iterate line by line through CSV to get data
     for (let i = 0; i < earthquakes.length; i++) {
-        //var data = earthquakes[i].split(/,/); //regular expression for a single comma
-        //console.log(data);
         let lat = earthquakes[i]['lat'];
         let lng = earthquakes[i]['lng'];
         let mag = earthquakes[i]['mag'];
@@ -233,9 +226,7 @@ function draw() {
 
         //draw circle
         let diameter = map(mag, 0, magMax, 0, 180);
-        // console.log(magcap);
-        // console.log(truemag);
-        // console.log("updating");
+
         if (truemag < magcap) {
             //change color based on selection
             if (!select) {
@@ -334,7 +325,7 @@ function mousePressed() {
  * @param {float} y1 - y coordinate point 1
  * @param {float} x2 - x coordinate point 2
  * @param {float} y2 - y coordinate point 2
- * @returns {number}
+ * @returns {float} - euclidean distance
  */
 function distance(x1, y1, x2, y2) {
     return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
