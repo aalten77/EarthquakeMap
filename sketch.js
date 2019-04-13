@@ -1,6 +1,6 @@
 /**
- * This is a data visualization of Earthquake data from 1 month. This project is based off of Daniel Shiffman's
- * coding challenge #57 - Mapping Earthquake Data.
+ * This is a data visualization of Earthquake data from March 1, 2019 to March 31, 2019.
+ * This project is based off of Daniel Shiffman's coding challenge #57 - Mapping Earthquake Data.
  *
  * Data collected from USGS Earthquake Hazards Program: https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php
  *
