@@ -278,6 +278,7 @@ function drawWords(x, y){
 function mousePressed() {
     let centerX = webMercatorX(center_lng);
     let centerY = webMercatorY(center_lat);
+    let magcap = magScaler.value();
     let scale = diaScaler.value();
 
     //reset the selected circle to false
@@ -290,6 +291,7 @@ function mousePressed() {
         let lat = earthquakes[i]['lat'];
         let lng = earthquakes[i]['lng'];
         let mag = earthquakes[i]['mag'];
+        let truemag = parseFloat(earthquakes[i]['mag']);
 
         // convert magnitude to logarithmic scale to get diameter of circle
         mag = Math.pow(10, mag);
@@ -306,8 +308,7 @@ function mousePressed() {
         let diameter = map(mag, 0, magMax, 0, 180);
 
         //check if click within bubble and updated selected in earthquakes array
-        if (distance(x, y, mouseX - (width / 2), mouseY - (height / 2)) < diameter * (scale / 2)) {
-            ellipse(mouseX - (width / 2), mouseY - (height / 2), 100, 100);
+        if (distance(x, y, mouseX - (width / 2), mouseY - (height / 2)) < diameter * (scale / 2) && truemag < magcap) {
             earthquakes[i]['selected'] = true;
             selectedId = i;
             break;
